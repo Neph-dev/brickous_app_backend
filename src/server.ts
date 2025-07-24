@@ -7,7 +7,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 
-import { logger, rateLimiter, verifyEmailConnection } from './shared/utils';
+import { createRateLimiter, logger, verifyEmailConnection } from './shared/utils';
 import { ErrorResponse } from './constants';
 import apiRouter from './routes';
 import propertyRouter from './modules/property/routes/propertyRoutes';
@@ -60,6 +60,8 @@ app.use(cors({
     },
     credentials: true
 }));
+
+const rateLimiter = createRateLimiter();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

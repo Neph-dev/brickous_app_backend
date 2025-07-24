@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
 import { ErrorResponse } from '../../../constants';
 import { activateUser, createUser } from '../../user/controllers/userController';
 import { MongoosePreAuthSessionRepo } from '../infra/PreAuthSessionRepo';
@@ -8,6 +7,24 @@ import { PreAuthSessionType } from '../types';
 import { AppError, generateAccessToken, logger } from '../../../shared/utils';
 import { MongooseUserRepo } from '../../user/infra';
 
+/**
+ * Controller for user signup process.
+ * 
+ * This controller handles the user registration flow by:
+ * 1. Creating a new user with the provided request data
+ * 2. Removing any existing pre-authentication sessions for the user's email
+ * 3. Creating a new pre-authentication session with a verification code
+ * 4. Responding with session details for the client to proceed with verification
+ *
+ * @param req - Express request object containing user registration data
+ * @param res - Express response object used to send back the API response
+ * 
+ * @returns A Promise that resolves to an Express response with:
+ *   - Status 201 and session details on successful registration
+ *   - Appropriate error status and message if registration fails
+ * 
+ * @throws {AppError} When validation fails or other application-specific errors occur
+ */
 export const signupController = async (req: Request, res: Response) => {
     const { GENERIC } = ErrorResponse;
 
@@ -46,6 +63,28 @@ export const signupController = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Controller for verifying user signup using a verification code.
+ * 
+ * This function handles the verification process after a user signs up:
+ * 1. Validates that required data (preAuthSessionId, code, deviceId) is present
+ * 2. Retrieves the pre-authentication session from the database
+ * 3. Verifies that the code matches and hasn't expired
+ * 4. Confirms the device ID matches the session
+ * 5. Activates the user account
+ * 6. Deletes the pre-authentication session
+ * 7. Generates access and refresh tokens for the user
+ * 8. Sets authentication tokens in response headers
+ * 
+ * @param req - Express request object containing verification data in the body:
+ *   - preAuthSessionId: Unique identifier for the pre-authentication session
+ *   - code: Verification code sent to the user
+ *   - deviceId: Identifier for the device making the request
+ * @param res - Express response object used to send verification results to client
+ * @returns Express response with appropriate status code and message
+ * 
+ * @throws Returns error response if verification fails for any reason
+ */
 export const verifySignupController = async (req: Request, res: Response) => {
     const { GENERIC, NOT_FOUND } = ErrorResponse;
 
