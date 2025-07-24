@@ -7,11 +7,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 
-import { logger, rateLimiter, verifyEmailConnection } from './utils';
+import { logger, rateLimiter, verifyEmailConnection } from './shared/utils';
 import { ErrorResponse } from './constants';
 import apiRouter from './routes';
 import propertyRouter from './modules/property/routes/propertyRoutes';
 import developerRouter from './modules/developer/routes/developerRoutes';
+import authRouter from './modules/auth/routes/authRoutes';
 
 
 const { UNAUTHORIZED, GENERIC, NOT_FOUND } = ErrorResponse;
@@ -129,6 +130,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
     app.use('/api/v1', apiRouter);
 });
+
+app.use('/api/v1', authRouter);
 app.use('/api/v1', propertyRouter);
 app.use('/api/v1', developerRouter);
 

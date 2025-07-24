@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../utils';
+import { logger } from '../shared/utils';
 import { ErrorResponse } from '../constants';
 import { requireAuth } from './requireAuth';
 
@@ -7,30 +7,31 @@ const { UNAUTHORIZED, NOT_FOUND } = ErrorResponse;
 
 export const checkDeveloperExists = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        requireAuth(req, res, async (err) => {
-            if (err) {
-                return next(err);
-            }
+        // requireAuth(req, res, async (err) => {
+        //     if (err) {
+        //         return next(err);
+        //     }
 
-            const sub = req.body.auth?.sub;
-            if (!sub) {
-                return res.status(401).json(UNAUTHORIZED);
-            }
+        //     const sub = req.body.auth?.sub;
+        //     if (!sub) {
+        //         return res.status(401).json(UNAUTHORIZED);
+        //     }
 
-            const developerRepo = new MongooseDeveloperRepo();
-            const developer = await developerRepo.findBySub(sub);
+        //     const developerRepo = new MongooseDeveloperRepo();
+        //     const developer = await developerRepo.findBySub(sub);
 
-            if (developer) (req as any).developer = developer;
+        //     if (developer) (req as any).developer = developer;
 
-            logger.info(`Developer check for ${req.path}`, {
-                sub,
-                developerFound: !!developer,
-                path: req.path,
-                method: req.method
-            });
+        //     logger.info(`Developer check for ${req.path}`, {
+        //         sub,
+        //         developerFound: !!developer,
+        //         path: req.path,
+        //         method: req.method
+        //     });
 
-            next();
-        });
+        //     next();
+        // });
+        next();
     } catch (error) {
         logger.error('Error in checkDeveloperExists middleware', {
             error: error instanceof Error ? error.message : 'Unknown error',

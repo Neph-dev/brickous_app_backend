@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { ErrorResponse } from '../../../constants';
-import { AppError } from '../../../utils';
+import { AppError } from '../../../shared/utils';
 import { validatePropertyFields } from '../utils';
 import { MongoosePropertyRepo } from '../infra';
 

@@ -1,19 +1,17 @@
+import { AccountStatus } from "./AccountStatus";
 import { AccountType } from "./AccountType";
-import { UserRole } from "./userRole";
+import { UserRole } from "./UserRole";
 
 export interface UserType {
-    id: string;
+    _id?: string;
     firstName: string;
     lastName: string;
     email: string;
     password: string;
-    role: UserRole;
-    account: {
-        accountType: AccountType;
-        isConfirmed: boolean;
-        confirmationCode?: string;
-        codeExpirationDate?: string;
-    };
-    createdAt: Date;
-    updatedAt: Date;
+    role?: UserRole;
+    status?: AccountStatus;
+    accountType: AccountType;
+    isConfirmed?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

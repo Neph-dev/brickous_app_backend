@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../utils';
+import { logger } from '../shared/utils';
 import { ErrorResponse } from '../constants';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -21,7 +21,7 @@ declare global {
 
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const accessToken = req.headers[ "access_token" ] as string;
+        const accessToken = req.headers[ "st-access-token" ] as string;
 
         if (!accessToken) {
             logger.warn('Authentication failed: No access token provided');

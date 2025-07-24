@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { emailValidation } from '../../../utils/validations';
+import { emailValidation } from '../../../shared/utils/validations';
 import { AccountStatus, AccountType, UserRole, UserType } from '../types';
 
 const UserSchema = new Schema<UserType>({
@@ -36,47 +36,29 @@ const UserSchema = new Schema<UserType>({
     role: {
         type: String,
         required: true,
-        enum: [ UserRole.Admin, UserRole.User, UserRole.Guest ],
+        enum: [ UserRole.Admin, UserRole.User ],
     },
-    account: {
-        accountType: {
-            type: String,
-            required: true,
-            enum: [ AccountType.Inverstor, AccountType.Developer ],
-        },
-        isConfirmed: {
-            type: Boolean,
-            default: false,
-            required: true,
-        },
-        confirmationCode: {
-            type: String,
-            required: false,
-            trim: true,
-            minlength: 6,
-            maxlength: 6
-        },
-        codeExpirationDate: {
-            type: String,
-            required: false,
-            default: () => {
-                const date = new Date();
-                date.setMinutes(date.getMinutes() + 10);
-                return date.toISOString();
-            },
-        },
-        status: {
-            type: String,
-            required: true,
-            enum: [
-                AccountStatus.Active,
-                AccountStatus.Inactive,
-                AccountStatus.Suspended,
-                AccountStatus.Waitlist,
-                AccountStatus.Closed
-            ],
-            default: AccountStatus.Inactive
-        }
+    accountType: {
+        type: String,
+        required: true,
+        enum: [ AccountType.Inverstor, AccountType.Developer ],
+    },
+    isConfirmed: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: [
+            AccountStatus.Active,
+            AccountStatus.Inactive,
+            AccountStatus.Suspended,
+            AccountStatus.Waitlist,
+            AccountStatus.Closed
+        ],
+        default: AccountStatus.Inactive
     },
     createdAt: {
         type: Date,

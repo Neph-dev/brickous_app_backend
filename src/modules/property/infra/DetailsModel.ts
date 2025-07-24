@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { Address } from '../../../shared/types/Address';
-import { addressValidation } from '../../../utils/validations';
+import { addressValidation } from '../../../shared/utils/validations';
 import { PropertyStage } from '../../../shared/types';
 import { DetailsType } from '../types';
 

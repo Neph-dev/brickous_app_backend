@@ -1,4 +1,5 @@
 export * from './AccountStatus';
 export * from './AccountType';
-export * from './userRole';
+export * from './UserRole';
 export * from './UserType';
+export * from './CreateUserResponse';

@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { DeveloperType } from '../types';
+import { addressValidation, urlValidation } from '../../../shared/utils/validations';
+import { Address } from '../../../shared/types';
 
 const DeveloperSchema = new Schema<DeveloperType>({
     users: {
@@ -23,10 +25,26 @@ const DeveloperSchema = new Schema<DeveloperType>({
         required: true,
         trim: true
     },
+    businessAddress: {
+        type: Object,
+        required: true,
+        validate: {
+            validator: function (address: Address) {
+                return addressValidation(address);
+            },
+            message: 'Invalid address format or missing required fields'
+        }
+    },
     website: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        validate: {
+            validator: function (url: string) {
+                return urlValidation(url);
+            },
+            message: 'Invalid website URL format'
+        }
     },
     logo: {
         type: String,

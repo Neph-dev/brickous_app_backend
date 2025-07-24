@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import { ErrorResponse } from '../constants';
 
 export const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || "smtp.zoho.com",

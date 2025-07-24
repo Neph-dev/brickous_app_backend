@@ -8,4 +8,5 @@ export const rateLimiter = rateLimit({
     skipSuccessfulRequests: false,
     handler: (req, res, next, options) =>
         res.status(options.statusCode).send(options.message),
+    message: 'Too many requests. Please try again after 15 minutes.'
 });

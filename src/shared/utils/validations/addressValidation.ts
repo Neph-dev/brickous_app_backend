@@ -1,4 +1,5 @@
-import { Address } from "../../shared/types";
+import { Address } from "../../types";
+
 
 export const addressValidation = (address: Address): boolean => {
     /*
@@ -12,7 +13,7 @@ export const addressValidation = (address: Address): boolean => {
         return false;
     }
 
-    if (!address.country || typeof address.country !== 'string' || address.country.trim().length === 0) {
+    if (!address.country || typeof address.country !== 'string' || address.country.trim().length === 0 || address.country.length !== 2) {
         return false;
     }
 
