@@ -40,7 +40,7 @@ import mongoose from 'mongoose';
  * - Logs authentication activities for security monitoring
  */
 export const signinController = async (req: Request, res: Response) => {
-    const { GENERIC, NOT_FOUND, UNAUTHORIZED } = ErrorResponse;
+    const { GENERIC } = ErrorResponse;
 
     try {
         const { email, password, deviceId = uuidv4() } = req.body;
@@ -119,6 +119,7 @@ export const signinController = async (req: Request, res: Response) => {
 
         res.setHeader('x-access-token', accessToken);
         res.setHeader('x-refresh-token', refreshToken);
+        res.setHeader('x-device-id', deviceId);
 
         logger.info(`User signed in successfully: ${user.email}`);
 

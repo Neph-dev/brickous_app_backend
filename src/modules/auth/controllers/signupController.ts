@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PreAuthSessionType } from '../types';
 import { AppError, generateAccessToken, logger } from '../../../shared/utils';
 import { MongooseUserRepo } from '../../user/infra';
+import { confirmationCodeTemplate } from '../../../shared/utils/emails/confirmationCodeTemplate';
 
 /**
  * Controller for user signup process.
@@ -47,6 +48,14 @@ export const signupController = async (req: Request, res: Response) => {
         };
 
         await preAuthSessionRepo.createSession(preAuthSession);
+
+        const expiresInMinutes = Math.floor((new Date(preAuthSession.expiresAt).getTime() - Date.now()) / 60000);
+
+        const sendEmail = await confirmationCodeTemplate(preAuthSession.code, newUser.email, `${expiresInMinutes} minutes`);
+        if (!sendEmail) {
+            logger.error('Failed to send confirmation email');
+            throw new AppError('Failed to send confirmation email', 'EMAIL_SEND_ERROR', 500);
+        }
 
         res.status(201).json({
             status: 201,

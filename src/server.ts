@@ -58,7 +58,8 @@ app.use(cors({
             callback(new Error(UNAUTHORIZED.message));
         }
     },
-    credentials: true
+    credentials: true,
+    exposedHeaders: [ 'x-access-token', 'x-refresh-token', 'x-device-id' ],
 }));
 
 const rateLimiter = createRateLimiter();
@@ -114,7 +115,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
             statusCode: res.statusCode,
             duration,
             contentLength: res.get('Content-Length'),
-            userId: req.body.auth?.sub || 'unauthenticated'
+            userId: req.body?.auth?.sub || 'unauthenticated'
         });
 
         if (res.statusCode === 401 || res.statusCode === 403) {
@@ -123,7 +124,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
                 method: req.method,
                 path: req.path,
                 ip: req.ip,
-                userId: req.body.auth?.sub || 'unauthenticated'
+                userId: req.body?.auth?.sub || 'unauthenticated'
             });
         }
     });
