@@ -3,7 +3,6 @@ import { logger } from '../shared/utils';
 import { ErrorResponse } from '../constants';
 import { requireAuth } from './requireAuth';
 import { MongooseUserRepo } from '../modules/user/infra';
-import { UserRole } from '../modules/user/types/UserRole';
 import { AccountType } from '../modules/user/types';
 
 const { UNAUTHORIZED, NOT_FOUND } = ErrorResponse;

@@ -20,7 +20,6 @@ export class MongooseDeveloperRepo implements DeveloperRepo {
     }
 
     async getDeveloperByUserId(userId: string): Promise<DeveloperType | null> {
-        // search the array of users in the developer model and return the developer if found
         return executeDatabaseOperation(async () => {
             const developer = await DeveloperModel.findOne({ users: userId });
             if (!developer) return null;
