@@ -1,13 +1,16 @@
-import { executeDatabaseOperation } from "../../../shared/utils";
+import { ErrorResponse } from "../../../constants";
+import { AppError, executeDatabaseOperation } from "../../../shared/utils";
 import { PropertyModel } from "./";
 
 export interface PropertyRepo {
     save(data: any): Promise<void>;
     update(id: string, data: any): Promise<any>;
     delete(id: string): Promise<void>;
-    getById(id: string): Promise<any>;
+    findById(id: string): Promise<any>;
     getAll(): Promise<any[]>;
 }
+
+const { NOT_FOUND } = ErrorResponse;
 
 export class MongoosePropertyRepo implements PropertyRepo {
     async save(data: any): Promise<void> {
@@ -18,15 +21,23 @@ export class MongoosePropertyRepo implements PropertyRepo {
     }
 
     async update(id: string, data: any): Promise<any> {
-        // Implementation for updating a property in MongoDB
+        return executeDatabaseOperation(async () => {
+            const updatedDoc = await PropertyModel.findByIdAndUpdate(id, data, { new: true });
+            if (!updatedDoc) throw new AppError('Property not found', NOT_FOUND.code, NOT_FOUND.statusCode);
+            return updatedDoc;
+        }, 'update');
     }
 
     async delete(id: string): Promise<void> {
         // Implementation for deleting a property in MongoDB
     }
 
-    async getById(id: string): Promise<any> {
-        // Implementation for getting a property by ID from MongoDB
+    async findById(id: string): Promise<any> {
+        return executeDatabaseOperation(async () => {
+            const doc = await PropertyModel.findById(id);
+            if (!doc) throw new AppError('Property not found', NOT_FOUND.code, NOT_FOUND.statusCode);
+            return doc;
+        }, 'findById');
     }
 
     async getAll(): Promise<any[]> {

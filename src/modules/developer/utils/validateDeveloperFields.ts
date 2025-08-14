@@ -2,8 +2,7 @@ import { AppError } from "../../../shared/utils";
 import { addressValidation, emailValidation, phoneNumberValidation } from "../../../shared/utils/validations";
 import { DeveloperType } from "../types";
 
-
-export const validateDeveloperFields = (fields: DeveloperType) => {
+export const validateDeveloperFields = (fields: Omit<DeveloperType, '_id'>) => {
     const requiredFields = [ "name", "email", "phone", "businessAddress" ] as const;
 
     const missingFields = requiredFields.filter(field => !fields.hasOwnProperty(field));

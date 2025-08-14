@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Address } from "../../../shared/types";
 
 export interface DeveloperType {
+    _id: mongoose.Types.ObjectId;
     users: mongoose.Types.ObjectId[];
     name: string;
     email: string;

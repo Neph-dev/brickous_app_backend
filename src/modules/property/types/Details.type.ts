@@ -5,7 +5,6 @@ export interface DetailsType {
     address: Address;
     propertyStage: PropertyStage;
     name: string;
-    property: mongoose.Types.ObjectId;
     propertyType: PropertyType;
     propertyScope: PropertyScope;
     description?: string;

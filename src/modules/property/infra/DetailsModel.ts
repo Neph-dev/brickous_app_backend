@@ -34,7 +34,8 @@ const DetailsSchema = new Schema<DetailsType>({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     description: {
         type: String,

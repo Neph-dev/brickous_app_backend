@@ -6,3 +6,4 @@ export { verifyEmailConnection } from './verifyEmailConnection';
 export { generateAccessToken } from './generateAccessToken';
 export { generateCode } from './generateCode';
 export { sanitise } from './sanitize';
+export { errorHandler } from './errorHandler';

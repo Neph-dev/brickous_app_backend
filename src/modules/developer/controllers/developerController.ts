@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { ErrorResponse } from '../../../constants';
-import { AppError } from '../../../shared/utils';
+import { AppError, errorHandler } from '../../../shared/utils';
 import { validateDeveloperFields } from '../utils';
 import { MongooseDeveloperRepo } from '../infra';
 import { MongooseUserRepo } from '../../user/infra';
@@ -56,7 +56,7 @@ export class DeveloperController {
                 message: 'Developer created successfully'
             });
         } catch (error) {
-            return this.handleError(error, res);
+            return errorHandler(error, res);
         }
     };
 
@@ -82,19 +82,19 @@ export class DeveloperController {
                 data: developer
             });
         } catch (error) {
-            return this.handleError(error, res);
+            return errorHandler(error, res);
         }
     };
 
-    private handleError(error: unknown, res: Response) {
-        if (error instanceof AppError) {
-            return res.status(error.statusCode).json({
-                status: error.statusCode,
-                message: error.message,
-                code: error.code
-            });
-        } else {
-            return res.status(GENERIC.statusCode).json(GENERIC);
-        }
-    }
+    // private errorHandler(error: unknown, res: Response) {
+    //     if (error instanceof AppError) {
+    //         return res.status(error.statusCode).json({
+    //             status: error.statusCode,
+    //             message: error.message,
+    //             code: error.code
+    //         });
+    //     } else {
+    //         return res.status(GENERIC.statusCode).json(GENERIC);
+    //     }
+    // }
 }
