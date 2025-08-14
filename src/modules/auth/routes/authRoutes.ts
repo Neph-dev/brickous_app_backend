@@ -5,6 +5,7 @@ import { logoutController, getActiveSessions } from '../controllers/sessionContr
 import { refreshTokenController } from '../controllers/refreshTokenController';
 import { hashPasswordMiddleware, requireAuth } from '../../../middlewares';
 import { createRateLimiter } from '../../../shared/utils/rateLimiter';
+import { requestPasswordReset } from '../controllers/passwordResetController';
 
 const authRouter = express.Router();
 
@@ -65,5 +66,19 @@ authRouter.get('/sessions', requireAuth, async (req: Request, res: Response, nex
         next(error);
     }
 });
+
+authRouter.post('/password/reset',
+    createRateLimiter({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 5,
+        message: 'Too many attempts, please try again after 15 minutes.'
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await requestPasswordReset(req, res);
+        } catch (error) {
+            next(error);
+        }
+    });
 
 export default authRouter;

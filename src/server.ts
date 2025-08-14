@@ -7,7 +7,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 
-import { createRateLimiter, logger, verifyEmailConnection } from './shared/utils';
+import { createRateLimiter, logger, sanitise, verifyEmailConnection } from './shared/utils';
 import { ErrorResponse } from './constants';
 import apiRouter from './routes';
 import propertyRouter from './modules/property/routes/propertyRoutes';

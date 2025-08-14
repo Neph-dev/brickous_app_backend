@@ -4,7 +4,7 @@ import { activateUser, createUser } from '../../user/controllers/userController'
 import { MongoosePreAuthSessionRepo } from '../infra/PreAuthSessionRepo';
 import { v4 as uuidv4 } from "uuid";
 import { PreAuthSessionType } from '../types';
-import { AppError, generateAccessToken, logger } from '../../../shared/utils';
+import { AppError, generateAccessToken, generateCode, logger } from '../../../shared/utils';
 import { MongooseUserRepo } from '../../user/infra';
 import { confirmationCodeTemplate } from '../../../shared/utils/emails/confirmationCodeTemplate';
 
@@ -43,7 +43,7 @@ export const signupController = async (req: Request, res: Response) => {
             preAuthSessionId: uuidv4(),
             email: newUser.email,
             deviceId: uuidv4(),
-            code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+            code: generateCode(6),
             expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
         };
 
@@ -52,7 +52,7 @@ export const signupController = async (req: Request, res: Response) => {
         const expiresInMinutes = Math.floor((new Date(preAuthSession.expiresAt).getTime() - Date.now()) / 60000);
 
         const sendEmail = await confirmationCodeTemplate(preAuthSession.code, newUser.email, `${expiresInMinutes} minutes`);
-        if (!sendEmail) {
+        if (sendEmail !== 200) {
             logger.error('Failed to send confirmation email');
             throw new AppError('Failed to send confirmation email', 'EMAIL_SEND_ERROR', 500);
         }
@@ -137,7 +137,6 @@ export const verifySignupController = async (req: Request, res: Response) => {
 
         await activateUser(session.email);
         await preAuthSessionRepo.deleteSession(preAuthSessionId);
-
 
         const userRepo = new MongooseUserRepo();
         const user = await userRepo.getByEmail(session.email);

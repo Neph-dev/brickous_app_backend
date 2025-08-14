@@ -33,6 +33,15 @@ export const ErrorResponse = {
         statusCode: 400,
         code: "INVALID_FIELD",
         message: "Invalid field provided",
+    },
+    MAX_ATTEMPTS: {
+        statusCode: 429,
+        code: "MAX_ATTEMPTS",
+        message: "Too many attempts. Please try again later.",
+    },
+    EMAIL_SEND_ERROR: {
+        statusCode: 500,
+        code: "EMAIL_SEND_ERROR",
+        message: "Failed to send email",
     }
-
 };

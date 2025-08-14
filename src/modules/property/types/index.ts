@@ -1,2 +1,4 @@
 export * from "./Details.type";
-export * from "./Property.type";
+export * from "./PropertySchema.type";
+export * from "./PropertyImageSchema.type";
+export * from "./PropertyDocs.type";

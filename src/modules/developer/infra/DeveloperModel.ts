@@ -61,6 +61,15 @@ const DeveloperSchema = new Schema<DeveloperType>({
     }
 });
 
+DeveloperSchema.pre(/^find/, function (this: mongoose.Query<any, any>) {
+    this.populate({
+        path: 'users',
+        select: 'firstName lastName role',
+        model: 'User'
+    });
+});
+
+
 DeveloperSchema.pre('save', function (next) {
     this.updatedAt = new Date();
     next();

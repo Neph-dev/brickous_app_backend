@@ -7,49 +7,94 @@ import { MongooseDeveloperRepo } from '../infra';
 import { MongooseUserRepo } from '../../user/infra';
 import { UserRole } from '../../user/types/UserRole';
 
-export const createDeveloper = async (req: Request, res: Response) => {
-    const { GENERIC } = ErrorResponse;
+const { GENERIC } = ErrorResponse;
 
-    try {
-        validateDeveloperFields(req.body);
+export class DeveloperController {
+    private developerRepo: MongooseDeveloperRepo;
+    private userRepo: MongooseUserRepo;
 
-        const userRepo = new MongooseUserRepo();
-        if (!req.user || !req.user.sub) {
-            throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
+    constructor() {
+        this.developerRepo = new MongooseDeveloperRepo();
+        this.userRepo = new MongooseUserRepo();
+    }
+
+    createDeveloper = async (req: Request, res: Response) => {
+        try {
+            validateDeveloperFields(req.body);
+
+            if (!req.user || !req.user.sub) {
+                throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
+            }
+
+            const [ existingByUser, existingByEmail ] = await Promise.all([
+                this.developerRepo.getDeveloperByUserId(req.user.sub),
+                this.developerRepo.getDeveloperByEmail(req.body.email)
+            ]);
+
+            if (existingByUser) {
+                throw new AppError('Developer already exists', 'DEVELOPER_ALREADY_EXISTS', 409);
+            }
+
+            if (existingByEmail) {
+                throw new AppError('Developer email already in use', 'DEVELOPER_EMAIL_ALREADY_IN_USE', 409);
+            }
+
+            const developerData = {
+                ...req.body,
+                users: [ req.user.sub ]
+            };
+
+            await this.developerRepo.createDeveloper(developerData);
+
+            const updatedUser = await this.userRepo.updateRole(req.user.sub, UserRole.Admin);
+            if (!updatedUser) {
+                throw new AppError('Failed to update user role', 'USER_ROLE_UPDATE_FAILED', 500);
+            }
+
+            return res.status(201).json({
+                status: 201,
+                message: 'Developer created successfully'
+            });
+        } catch (error) {
+            return this.handleError(error, res);
         }
+    };
 
-        const updatedUser = await userRepo.updateRole(req.user.sub, UserRole.Admin);
-        if (!updatedUser) {
-            throw new AppError('Failed to update user role', 'USER_ROLE_UPDATE_FAILED', 500);
+    getDeveloperByUserId = async (req: Request, res: Response) => {
+        try {
+            if (!req.user || !req.user.sub) {
+                throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
+            }
+
+            const developer = await this.developerRepo.getDeveloperByUserId(req.user.sub);
+
+            if (!developer) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'Developer not found',
+                    code: 'DEVELOPER_NOT_FOUND'
+                });
+            }
+
+            return res.status(200).json({
+                status: 200,
+                message: 'Developer retrieved successfully',
+                data: developer
+            });
+        } catch (error) {
+            return this.handleError(error, res);
         }
+    };
 
-        const developerData = {
-            ...req.body,
-            users: [ updatedUser._id ]
-        };
-
-        const repo = new MongooseDeveloperRepo();
-
-
-        const developer = await repo.getDeveloperByUserId(req.user.sub);
-        if (developer) {
-            throw new AppError('Developer already exists', 'DEVELOPER_ALREADY_EXISTS', 409);
-        }
-
-        await repo.createDeveloper(developerData);
-
-        res.status(201).json({
-            status: 201,
-            message: 'Developer created successfully'
-        });
-    } catch (error) {
+    private handleError(error: unknown, res: Response) {
         if (error instanceof AppError) {
-            res.status(error.statusCode).json({
+            return res.status(error.statusCode).json({
                 status: error.statusCode,
-                message: error.message
+                message: error.message,
+                code: error.code
             });
         } else {
-            res.status(GENERIC.statusCode).json(GENERIC);
+            return res.status(GENERIC.statusCode).json(GENERIC);
         }
     }
-};
+}

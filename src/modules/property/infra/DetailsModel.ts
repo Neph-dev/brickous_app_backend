@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { Address } from '../../../shared/types/Address';
 import { addressValidation } from '../../../shared/utils/validations';
-import { PropertyStage } from '../../../shared/types';
+import { PropertyScope, PropertyStage, PropertyType } from '../../../shared/types';
 import { DetailsType } from '../types';
 
 const DetailsSchema = new Schema<DetailsType>({
@@ -9,22 +9,39 @@ const DetailsSchema = new Schema<DetailsType>({
         type: Object,
         required: true,
         validate: {
-            validator: function (address: Address) {
-                return addressValidation(address);
-            },
+            validator: (address: Address) => addressValidation(address),
             message: 'Invalid address format or missing required fields'
         }
     },
     propertyStage: {
         type: String,
         required: true,
-        enum: [ PropertyStage.PLANNING, PropertyStage.UNDER_CONSTRUCTION ],
+        enum: PropertyStage,
         default: PropertyStage.PLANNING
+    },
+    propertyType: {
+        type: String,
+        required: true,
+        trim: true,
+        enum: PropertyType
+    },
+    propertyScope: {
+        type: String,
+        required: true,
+        enum: PropertyScope,
+        default: PropertyScope.UNIT
     },
     name: {
         type: String,
         required: true,
         trim: true
+    },
+    description: {
+        type: String,
+        required: false,
+        trim: true,
+        minlength: 50,
+        maxlength: 300
     },
     createdAt: {
         type: Date,

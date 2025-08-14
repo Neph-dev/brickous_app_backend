@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MIN_LENGTH = 8;
 
 // Regex explanation:
 // - (?=.*[a-z])        → at least one lowercase letter

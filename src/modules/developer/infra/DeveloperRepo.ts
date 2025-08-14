@@ -5,6 +5,7 @@ import { DeveloperModel } from "./";
 export interface DeveloperRepo {
     createDeveloper(data: any): Promise<void>;
     getDeveloperByUserId(userId: string): Promise<DeveloperType | null>;
+    getDeveloperByEmail(email: string): Promise<DeveloperType | null>;
     update(id: string, data: any): Promise<any>;
     delete(id: string): Promise<void>;
     getById(id: string): Promise<any>;
@@ -21,10 +22,23 @@ export class MongooseDeveloperRepo implements DeveloperRepo {
 
     async getDeveloperByUserId(userId: string): Promise<DeveloperType | null> {
         return executeDatabaseOperation(async () => {
-            const developer = await DeveloperModel.findOne({ users: userId });
+            const developer = await DeveloperModel.findOne({ users: userId })
+                .populate({
+                    path: 'users',
+                    select: 'firstName lastName role',
+                    model: 'User'
+                });
             if (!developer) return null;
             return developer.toObject() as DeveloperType;
         }, 'getDeveloperByUserId');
+    }
+
+    async getDeveloperByEmail(email: string): Promise<DeveloperType | null> {
+        return executeDatabaseOperation(async () => {
+            const developer = await DeveloperModel.findOne({ email });
+            if (!developer) return null;
+            return developer.toObject() as DeveloperType;
+        }, 'getDeveloperByEmail');
     }
 
     async update(id: string, data: any): Promise<any> {

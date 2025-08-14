@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
-import { PropertyType } from '../types';
-import { InvestmentType } from '../../../shared/types';
+import { PropertySchemaType } from '../types';
+import { InvestmentType, PropertyStatus } from '../../../shared/types';
 
-const PropertySchema = new Schema<PropertyType>({
+const PropertySchema = new Schema<PropertySchemaType>({
     developer: {
         type: Schema.Types.ObjectId,
         ref: 'Developer',
@@ -19,6 +19,22 @@ const PropertySchema = new Schema<PropertyType>({
         ref: 'Details',
         required: false
     },
+    images: {
+        type: Schema.Types.ObjectId,
+        ref: 'PropertyImage',
+        required: false
+    },
+    documents: {
+        type: [ Schema.Types.ObjectId ],
+        ref: 'PropertyDocs',
+        required: false
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: PropertyStatus,
+        default: PropertyStatus.Pending
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -27,6 +43,18 @@ const PropertySchema = new Schema<PropertyType>({
         type: Date,
         default: Date.now
     }
+});
+
+PropertySchema.pre(/^find/, function (this: mongoose.Query<any, any>) {
+    this.populate({
+        path: 'details',
+        select: 'address propertyStage propertyType propertyScope name description',
+        model: 'Details'
+    }).populate({
+        path: 'images',
+        select: 'imageUrls thumbnailUrl',
+        model: 'PropertyImage'
+    });
 });
 
 PropertySchema.pre('save', function (next) {
