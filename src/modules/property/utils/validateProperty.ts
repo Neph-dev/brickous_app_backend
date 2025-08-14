@@ -1,7 +1,7 @@
 import { InvestmentType } from "../../../shared/types";
-import { PropertyType } from "../types";
+import { PropertySchemaType } from "../types";
 
-export const validatePropertyFields = (data: PropertyType) => {
+export const validatePropertyFields = (data: PropertySchemaType) => {
     const requiredFields = [ 'developer', 'investmentType' ];
     const missingFields = requiredFields.filter(field => !data.hasOwnProperty(field));
     const validInvestmentTypes = Object.values(InvestmentType);
