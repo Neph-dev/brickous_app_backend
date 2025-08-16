@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 
 import { ErrorResponse } from '../../../constants';
-import { AppError, errorHandler } from '../../../shared/utils';
+import { AppError, convertMulterFileToS3FileInfo, errorHandler, logger, uploadPropertyImages } from '../../../shared/utils';
 import { validatePropertyDetails, validatePropertyFields } from '../utils';
 import { MongoosePropertyRepo, MongoosePropertyDetailsRepo } from '../infra';
 import { MongooseDeveloperRepo } from '../../developer/infra';
 
-const { GENERIC, UNAUTHORIZED } = ErrorResponse;
+const { UNAUTHORIZED } = ErrorResponse;
 
 export class PropertyController {
     private propertyRepo: MongoosePropertyRepo;
@@ -19,7 +19,7 @@ export class PropertyController {
         this.developerRepo = new MongooseDeveloperRepo();
     }
 
-    createProperty = async (req: Request, res: Response) => {
+    async createProperty(req: Request, res: Response) {
         try {
             if (!req.user || !req.user.sub) {
                 throw new AppError('User not authenticated', 'UNAUTHORIZED', 401);
@@ -29,17 +29,14 @@ export class PropertyController {
                 throw new AppError(UNAUTHORIZED.message, UNAUTHORIZED.code, UNAUTHORIZED.statusCode);
             }
 
-            req.body.developer = developer._id;
-            validatePropertyFields(req.body);
+            const propertyData = {
+                ...req.body,
+                developer: developer._id
+            };
 
-            if (!developer) {
-                return res.status(404).json({
-                    status: 404,
-                    message: 'Developer not found',
-                });
-            }
+            validatePropertyFields(propertyData);
 
-            await this.propertyRepo.save(req.body);
+            await this.propertyRepo.save(propertyData);
 
             res.status(201).json({
                 status: 201,
@@ -50,7 +47,7 @@ export class PropertyController {
         }
     };
 
-    addPropertyDetails = async (req: Request, res: Response) => {
+    async addPropertyDetails(req: Request, res: Response) {
         try {
             const { propertyId, details } = req.body;
 
@@ -62,8 +59,16 @@ export class PropertyController {
                 message: 'Property details added successfully',
             });
         } catch (error: any) {
-            console.log('Error adding property details:', error?.code);
+            logger.error('Error adding property details', error);
             return errorHandler(error, res);
         }
     };
+
+    async uploadImages(req: Request, res: Response) {
+        try {
+        } catch (error: any) {
+            logger.error('Error uploading property images', error);
+            return errorHandler(error, res);
+        }
+    }
 }
