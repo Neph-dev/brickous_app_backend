@@ -29,6 +29,21 @@ const PropertySchema = new Schema<PropertySchemaType>({
         ref: 'PropertyDocs',
         required: false
     },
+    financials: {
+        type: [ Schema.Types.ObjectId ],
+        ref: 'Financials',
+        required: false
+    },
+    contract: {
+        type: String,
+        required: false,
+        validate: {
+            validator: function (v: string) {
+                return /^(0x)?[0-9a-f]{40}$/i.test(v);
+            },
+            message: (props) => `${props.value} is not a valid contract address!`
+        }
+    },
     status: {
         type: String,
         required: true,
@@ -54,6 +69,10 @@ PropertySchema.pre(/^find/, function (this: mongoose.Query<any, any>) {
         path: 'images',
         select: 'imageUrls thumbnailUrl',
         model: 'PropertyImage'
+    }).populate({
+        path: 'financials',
+        select: '',
+        model: 'Financials'
     });
 });
 

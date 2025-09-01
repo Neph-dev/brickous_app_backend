@@ -6,3 +6,5 @@ export * from './Currency';
 export * from './PropertyType';
 export * from './PropertyScope';
 export * from './PropertyStatus';
+export * from './ReturnModel';
+export * from './InvestmentPeriod';

@@ -4,7 +4,8 @@ enum BrickousTokenSymbol {
 }
 
 enum SupportedCurrency {
-    USD = 'USD'
+    USD = 'USD',
+    ZAR = 'ZAR'
 }
 
 export { BrickousTokenSymbol, SupportedCurrency };
