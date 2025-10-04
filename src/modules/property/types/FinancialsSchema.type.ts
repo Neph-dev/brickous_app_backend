@@ -1,4 +1,4 @@
-import { InvestmentPeriod, ReturnModel, SupportedCurrency } from "../../../shared/types";
+import { InvestmentPeriod, Maybe, ReturnModel, SupportedCurrency } from "../../../shared/types";
 
 export interface FinancialsSchemaType {
     returnModel: ReturnModel;
@@ -6,18 +6,19 @@ export interface FinancialsSchemaType {
     durationUnit: string;
     interestRate?: number;
     repaymentDate?: Date;
-    propertyValue: Value;
-    periods: Periods;
-    currentPeriod: InvestmentPeriod;
+    currency: SupportedCurrency;
+    propertyValue: number;
+    crowdfundingAmount: number;
+    periods: Maybe<Periods>;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 interface Periods {
-    currentPeriod?: InvestmentPeriod;
-    funding?: Dates;
-    holding?: Dates;
-    repayment?: Dates;
+    currentPeriod: InvestmentPeriod;
+    funding: Dates;
+    holding: Dates;
+    repayment: Dates;
 }
 
 interface Dates {
@@ -25,7 +26,7 @@ interface Dates {
     end?: Date;
 }
 
-interface Value {
+export interface Value {
     amount: number;
     currency: SupportedCurrency;
 }

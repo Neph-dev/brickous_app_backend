@@ -1,6 +1,6 @@
 export enum PropertyStatus {
     Pending = 'pending',
-    Published = 'published',
+    Deployed = 'deployed',
     Archived = 'archived',
     Inactive = 'inactive'
 }

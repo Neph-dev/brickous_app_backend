@@ -8,3 +8,4 @@ export * from './PropertyScope';
 export * from './PropertyStatus';
 export * from './ReturnModel';
 export * from './InvestmentPeriod';
+export * from './Generic';

@@ -25,12 +25,12 @@ const PropertySchema = new Schema<PropertySchemaType>({
         required: false
     },
     documents: {
-        type: [ Schema.Types.ObjectId ],
+        type: [Schema.Types.ObjectId],
         ref: 'PropertyDocs',
         required: false
     },
     financials: {
-        type: [ Schema.Types.ObjectId ],
+        type: Schema.Types.ObjectId,
         ref: 'Financials',
         required: false
     },

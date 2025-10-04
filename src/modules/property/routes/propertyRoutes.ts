@@ -22,4 +22,20 @@ propertyRouter.post('/add-property-details', requireDeveloperAccount, async (req
     }
 });
 
+propertyRouter.post('/add-financials', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await propertyController.addFinancials(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
+
+propertyRouter.post('/adjust-financials', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await propertyController.adjustFinancials(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
+
 export default propertyRouter;

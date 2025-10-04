@@ -17,3 +17,4 @@ export {
     convertMulterFileToS3FileInfo
 } from './uploadToS3Bucket';
 export type { S3UploadOptions, S3UploadResult, S3FileInfo } from './uploadToS3Bucket';
+export { parseIsoDate } from './parseIsoDate';

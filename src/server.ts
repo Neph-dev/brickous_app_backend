@@ -6,6 +6,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
+import os from 'os';
 
 import { createRateLimiter, logger, sanitise, verifyEmailConnection } from './shared/utils';
 import { ErrorResponse } from './constants';
@@ -21,6 +22,7 @@ const { UNAUTHORIZED, GENERIC, NOT_FOUND } = ErrorResponse;
 const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI || '';
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',').map(origin => origin.trim());
 
 const missingVars: string[] = [];
 
@@ -35,9 +37,8 @@ const app = express();
 
 app.use(helmet());
 
-const allowedOrigins = [ 'http://localhost:3000' ];
 if (NODE_ENV === 'production') {
-    allowedOrigins.push('');
+    ALLOWED_ORIGINS.push('');
 }
 
 // ! Uncomment the following lines to enforce HTTPS in production
@@ -52,14 +53,14 @@ if (NODE_ENV === 'production') {
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error(UNAUTHORIZED.message));
         }
     },
     credentials: true,
-    exposedHeaders: [ 'x-access-token', 'x-refresh-token', 'x-device-id' ],
+    exposedHeaders: ['x-access-token', 'x-refresh-token', 'x-device-id'],
 }));
 
 const rateLimiter = createRateLimiter();
@@ -87,7 +88,7 @@ app.get('/api/v1/health', async (req: Request, res: Response): Promise<void> => 
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
-    const requestId = req.headers[ 'x-request-id' ] || crypto.randomUUID();
+    const requestId = req.headers['x-request-id'] || crypto.randomUUID();
 
     res.setHeader('X-Request-ID', requestId);
 
@@ -108,7 +109,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
         const level = res.statusCode >= 500 ? 'error' :
             res.statusCode >= 400 ? 'warn' : 'info';
 
-        logger[ level ]('Request completed', {
+        logger[level]('Request completed', {
             requestId,
             method: req.method,
             path: req.path,
@@ -174,6 +175,17 @@ const connectDB = async () => {
         console.log('✅ Connected to MongoDB with Mongoose');
         app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
     } catch (err) {
+        // console current IP address
+        const interfaces = os.networkInterfaces();
+        for (const name of Object.keys(interfaces)) {
+            const addrs = interfaces[name];
+            if (!addrs) continue;
+            for (const iface of addrs) {
+                if (iface.family === 'IPv4' && !iface.internal) {
+                    console.log(`Current IP Address: ${iface.address}`);
+                }
+            }
+        }
         console.error('❌ Failed to connect to MongoDB:', err);
         process.exit(1);
     }

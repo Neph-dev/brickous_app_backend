@@ -10,12 +10,12 @@ const FinancialsSchema = new Schema<FinancialsSchemaType>({
     },
     duration: {
         type: String,
-        enum: [ "6", "12" ],
+        enum: ["6", "12"],
         required: true
     },
     durationUnit: {
         type: String,
-        enum: [ "months" ],
+        enum: ["months"],
         required: true,
         default: "months"
     },
@@ -28,17 +28,19 @@ const FinancialsSchema = new Schema<FinancialsSchemaType>({
         type: Date,
         required: false
     },
+    currency: {
+        type: String,
+        enum: Object.values(SupportedCurrency),
+        required: true,
+        default: SupportedCurrency.USD
+    },
+    crowdfundingAmount: {
+        type: Number,
+        required: false
+    },
     propertyValue: {
-        amount: {
-            type: Number,
-            required: false
-        },
-        currency: {
-            type: String,
-            enum: Object.values(SupportedCurrency),
-            required: true,
-            default: SupportedCurrency.USD
-        }
+        type: Number,
+        required: false
     },
     periods: {
         currentPeriod: {
