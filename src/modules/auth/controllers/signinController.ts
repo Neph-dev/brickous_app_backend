@@ -86,7 +86,7 @@ export const signinController = async (req: Request, res: Response) => {
 
         const JWT_SECRET = process.env.JWT_SECRET || '';
         const REFRESH_JWT_SECRET = process.env.REFRESH_JWT_SECRET || JWT_SECRET;
-        const accessTokenExpiresIn = 60 * 60; // 1 hour
+        const accessTokenExpiresIn = 6 * 60 * 60; // 6 hours
         const refreshTokenExpiresIn = 7 * 24 * 60 * 60; // 7 days
 
         const payload = {

@@ -48,9 +48,9 @@ declare global {
  */
 export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const accessToken = req.headers[ "x-access-token" ] as string;
-        const refreshToken = req.headers[ "x-refresh-token" ] as string;
-        const deviceId = req.headers[ "x-device-id" ] as string;
+        const accessToken = req.headers["x-access-token"] as string;
+        const refreshToken = req.headers["x-refresh-token"] as string;
+        const deviceId = req.headers["x-device-id"] as string;
 
         if (!accessToken) {
             logger.warn('Authentication failed: No access token provided');
@@ -111,7 +111,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
                         return res.status(401).json(TOKEN_EXPIRED);
                     }
 
-                    const accessTokenExpiresIn = 60 * 60; // 1 hour
+                    const accessTokenExpiresIn = 6 * 60 * 60; // 6 hours
 
                     const payload = {
                         sub: user._id,
