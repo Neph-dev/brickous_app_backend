@@ -8,38 +8,33 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import os from 'os';
 
-import { createRateLimiter, logger, sanitise, verifyEmailConnection } from './shared/utils';
+import { createRateLimiter, logger, verifyEmailConnection } from './shared/utils';
 import { ErrorResponse } from './constants';
 import apiRouter from './routes';
 import propertyRouter from './modules/property/routes/propertyRoutes';
 import developerRouter from './modules/developer/routes/developerRoutes';
 import authRouter from './modules/auth/routes/authRoutes';
+import { validateEnv } from './shared/utils/validations';
 
 
 const { UNAUTHORIZED, GENERIC, NOT_FOUND } = ErrorResponse;
 
+validateEnv();
 
 const PORT = process.env.PORT || 3001;
 const MONGODB_URI = process.env.MONGODB_URI || '';
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',').map(origin => origin.trim());
 
-const missingVars: string[] = [];
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
+    .split(',')
+    .map(origin => origin.trim());
 
-if (!MONGODB_URI) missingVars.push('MONGODB_URI');
-
-if (missingVars.length > 0) {
-    console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
-    process.exit(1);
-}
 
 const app = express();
 
 app.use(helmet());
 
-if (NODE_ENV === 'production') {
-    ALLOWED_ORIGINS.push('');
-}
+if (NODE_ENV === 'production') ALLOWED_ORIGINS.push('');
 
 // ! Uncomment the following lines to enforce HTTPS in production
 // app.use((req, res, next) => {
