@@ -1,5 +1,5 @@
 export interface PropertyImageSchema {
-    imageUrls: [ string ];
+    imageUrls: [string];
     thumbnailUrl: string;
     createdAt?: Date;
     updatedAt?: Date;
