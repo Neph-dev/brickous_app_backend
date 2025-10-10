@@ -55,6 +55,37 @@ export class PropertyController {
         }
     };
 
+    async getProperty(req: Request, res: Response) {
+        try {
+            const { propertyId } = req.params;
+
+            if (!propertyId) {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'propertyId is required',
+                    code: 'MISSING_PROPERTY_ID'
+                });
+            }
+
+            const property = await this.propertyRepo.findById(propertyId);
+            if (!property) {
+                return res.status(404).json({
+                    status: 404,
+                    message: 'Property not found',
+                    code: 'PROPERTY_NOT_FOUND'
+                });
+            }
+
+            return res.status(200).json({
+                status: 200,
+                data: property
+            });
+        } catch (error: any) {
+            logger.error('Error fetching property', { error: error?.message });
+            return errorHandler(error, res);
+        }
+    }
+
     async addPropertyDetails(req: Request, res: Response) {
         try {
             const { propertyId, details } = req.body;
@@ -144,6 +175,31 @@ export class PropertyController {
             });
         } catch (error: any) {
             logger.error('Error uploading property images', { error: error?.message });
+            return errorHandler(error, res);
+        }
+    }
+
+    async getImages(req: Request, res: Response) {
+        try {
+            const { propertyId } = req.params;
+
+            if (!propertyId) {
+                return res.status(400).json({
+                    status: 400,
+                    message: 'propertyId is required',
+                    code: 'MISSING_PROPERTY_ID'
+                });
+            }
+
+            const images = await this.imageRepo.get(propertyId);
+
+            return res.status(200).json({
+                status: 200,
+                message: 'Images retrieved successfully',
+                data: images
+            });
+        } catch (error: any) {
+            logger.error('Error retrieving property images', { error: error?.message });
             return errorHandler(error, res);
         }
     }

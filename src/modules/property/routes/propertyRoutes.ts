@@ -15,6 +15,18 @@ propertyRouter.post('/create-property', requireDeveloperAccount, async (req: Req
     }
 });
 
+propertyRouter.get(
+    '/get-property/:propertyId',
+    requireDeveloperAccount,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await propertyController.getProperty(req, res);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 propertyRouter.post('/add-property-details', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
     try {
         await propertyController.addPropertyDetails(req, res);
@@ -53,5 +65,17 @@ propertyRouter.post(
             next(error);
         }
     });
+
+propertyRouter.get(
+    '/get-images/:propertyId',
+    requireDeveloperAccount,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await propertyController.getImages(req, res);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 
 export default propertyRouter;

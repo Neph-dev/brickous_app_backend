@@ -1,10 +1,12 @@
 import { ErrorResponse } from "../../../constants";
 import { AppError } from "../../../shared/utils";
+import { PropertyImageSchema } from "../types";
 import { PropertyImageModel } from "./ImageModel";
 import { MongoosePropertyRepo } from "./PropertyRepo";
 
 export interface ImageRepo {
     save(propertyId: string, imageUrls: string[], thumbnailUrl?: string): Promise<void>;
+    get(propertyId: string): Promise<PropertyImageSchema>;
 }
 
 const { NOT_FOUND } = ErrorResponse;
@@ -37,5 +39,14 @@ export class MongooseImageRepo implements ImageRepo {
             propertyDoc.images = newImages._id;
             await propertyDoc.save();
         }
+    }
+
+    async get(propertyId: string): Promise<PropertyImageSchema> {
+        const propertyDoc = await this.propertyRepo.findById(propertyId);
+        if (!propertyDoc) throw new AppError('Property not found', NOT_FOUND.code, NOT_FOUND.statusCode);
+
+        if (!propertyDoc.images) throw new AppError('No images found for this property', NOT_FOUND.code, NOT_FOUND.statusCode);
+
+        return propertyDoc.images;
     }
 }
