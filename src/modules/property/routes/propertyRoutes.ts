@@ -1,10 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { requireDeveloperAccount } from '../../../middlewares';
-import { PropertyController } from '../controllers';
+import { FinancialsController, ImageController, PropertyController } from '../controllers';
 import { upload } from '../../../shared/utils/uploadToS3Bucket';
+import { PropertyDetailsController } from '../controllers/propertyDetailsController';
 
 const propertyRouter = express.Router();
 const propertyController = new PropertyController();
+const propertyDetailsController = new PropertyDetailsController();
+const imageController = new ImageController();
+const financialsController = new FinancialsController();
 
 
 propertyRouter.post('/create-property', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
@@ -29,7 +33,7 @@ propertyRouter.get(
 
 propertyRouter.post('/add-property-details', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await propertyController.addPropertyDetails(req, res);
+        await propertyDetailsController.addPropertyDetails(req, res);
     } catch (error) {
         next(error);
     }
@@ -37,7 +41,7 @@ propertyRouter.post('/add-property-details', requireDeveloperAccount, async (req
 
 propertyRouter.post('/add-financials', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await propertyController.addFinancials(req, res);
+        await financialsController.addFinancials(req, res);
     } catch (error) {
         next(error);
     }
@@ -45,7 +49,7 @@ propertyRouter.post('/add-financials', requireDeveloperAccount, async (req: Requ
 
 propertyRouter.post('/adjust-financials', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await propertyController.adjustFinancials(req, res);
+        await financialsController.adjustFinancials(req, res);
     } catch (error) {
         next(error);
     }
@@ -60,7 +64,7 @@ propertyRouter.post(
     requireDeveloperAccount,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await propertyController.uploadImages(req, res);
+            await imageController.uploadImages(req, res);
         } catch (error) {
             next(error);
         }
@@ -71,7 +75,7 @@ propertyRouter.get(
     requireDeveloperAccount,
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            await propertyController.getImages(req, res);
+            await imageController.getImages(req, res);
         } catch (error) {
             next(error);
         }
