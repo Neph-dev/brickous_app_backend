@@ -1,14 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { requireDeveloperAccount } from '../../../middlewares';
-import { FinancialsController, ImageController, PropertyController } from '../controllers';
-import { upload } from '../../../shared/utils/uploadToS3Bucket';
-import { PropertyDetailsController } from '../controllers/propertyDetailsController';
+import { DocumentController, FinancialsController, ImageController, PropertyController, PropertyDetailsController } from '../controllers';
+import { uploadDocs, uploadImages } from '../../../shared/utils/uploadToS3Bucket';
+import { DocumentType } from '../types';
 
 const propertyRouter = express.Router();
 const propertyController = new PropertyController();
 const propertyDetailsController = new PropertyDetailsController();
 const imageController = new ImageController();
 const financialsController = new FinancialsController();
+const documentController = new DocumentController();
 
 
 propertyRouter.post('/create-property', requireDeveloperAccount, async (req: Request, res: Response, next: NextFunction) => {
@@ -57,7 +58,7 @@ propertyRouter.post('/adjust-financials', requireDeveloperAccount, async (req: R
 
 propertyRouter.post(
     '/upload-images/:propertyId',
-    upload.fields([
+    uploadImages.fields([
         { name: 'images', maxCount: 20 },
         { name: 'thumbnail', maxCount: 1 }
     ]),
@@ -76,6 +77,22 @@ propertyRouter.get(
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             await imageController.getImages(req, res);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+propertyRouter.post(
+    '/upload-documents/:propertyId',
+    uploadDocs.fields([
+        { name: 'TitleDeed', maxCount: 1 },
+        { name: 'ValuationReport', maxCount: 1 }
+    ]),
+    requireDeveloperAccount,
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await documentController.addPropertyDocuments(req, res);
         } catch (error) {
             next(error);
         }

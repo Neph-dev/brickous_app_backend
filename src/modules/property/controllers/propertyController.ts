@@ -3,13 +3,11 @@ import { Request, Response } from 'express';
 import { ErrorResponse } from '../../../constants';
 import { AppError, errorHandler, logger } from '../../../shared/utils';
 import { validatePropertyFields } from '../utils';
-import { MongoosePropertyRepo, MongoosePropertyDetailsRepo, MongooseFinancialsRepo } from '../infra';
+import { MongoosePropertyRepo } from '../infra';
 import { MongooseDeveloperRepo } from '../../developer/infra';
-import { MongooseImageRepo } from '../infra/ImageRepo';
 
 const { UNAUTHORIZED } = ErrorResponse;
 
-const AWS_S3_BUCKET_IMAGES_BASE_URL = process.env.AWS_S3_BUCKET_IMAGES_BASE_URL || '';
 
 export class PropertyController {
     private propertyRepo: MongoosePropertyRepo;

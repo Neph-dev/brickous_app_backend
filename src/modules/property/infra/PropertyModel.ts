@@ -73,6 +73,10 @@ PropertySchema.pre(/^find/, function (this: mongoose.Query<any, any>) {
         path: 'financials',
         select: '',
         model: 'Financials'
+    }).populate({
+        path: 'documents',
+        select: '',
+        model: 'PropertyDocs'
     });
 });
 
