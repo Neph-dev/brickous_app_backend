@@ -1,6 +1,6 @@
 // import mongoose from "mongoose";
 import { ErrorResponse } from "../../../constants";
-import { AppError, executeDatabaseOperation } from "../../../shared/utils";
+import { AppError, executeDatabaseOperation, logger } from "../../../shared/utils";
 import { DocumentType, PropertyDocsType } from "../types";
 import { MongoosePropertyRepo, PropertyModel } from "./";
 import { PropertyDocsModel } from "./DocumentModel";
@@ -20,61 +20,72 @@ export class MongooseDocumentRepo implements DocumentRepo {
     }
 
     async save(data: PropertyDocsType[], propertyId: string): Promise<void> {
-        console.log("Saving documents to propertyId:", propertyId);
-        console.log("Documents data:", data);
+        logger.info("Saving documents to propertyId", { propertyId });
 
         return executeDatabaseOperation(async () => {
             const propertyDoc = await this.propertyRepo.findById(propertyId);
             if (!propertyDoc) throw new AppError('Property not found', NOT_FOUND.code, NOT_FOUND.statusCode);
 
-            const getExistingDocumentByType = (type: DocumentType,) => {
+            const getExistingDocumentByType = (type: DocumentType) => {
                 return propertyDoc.documents?.find((doc: PropertyDocsType) => doc.documentType === type);
             };
 
-            data.forEach(async (doc) => {
+            if (!propertyDoc.documents) {
+                propertyDoc.documents = [];
+            }
+
+            for (const doc of data) {
                 const existingDoc = getExistingDocumentByType(doc.documentType);
+
                 if (existingDoc) {
-                    console.log("Existing document found, replacing:", existingDoc);
+                    logger.info("Existing document found, replacing", { documentType: doc.documentType, existingDocumentId: (existingDoc as any)?._id ?? existingDoc });
                     const existingId = (existingDoc as any)?._id ?? existingDoc;
 
                     if (existingId) {
                         await PropertyDocsModel.findByIdAndDelete(existingId);
                     }
 
-                    // Create and save the new document
                     const newDoc = new PropertyDocsModel(doc);
                     await newDoc.save();
 
-                    // // Replace the reference in the property's documents array
-                    // if (Array.isArray(propertyDoc.documents)) {
-                    //     const idx = propertyDoc.documents.findIndex((d: any) => {
-                    //         const dId = d && ((d._id) ? String(d._id) : String(d));
-                    //         return dId === String(existingId);
-                    //     });
-                    //     if (idx !== -1) {
-                    //         propertyDoc.documents[idx] = newDoc._id;
-                    //     } else {
-                    //         // fallback: push new doc id
-                    //         propertyDoc.documents.push(newDoc._id);
-                    //     }
-                    // } else {
-                    //     propertyDoc.documents = [newDoc._id];
-                    // }
+                    if (Array.isArray(propertyDoc.documents)) {
+                        const idx = propertyDoc.documents.findIndex((d: any) => {
+                            const dId = d && ((d._id) ? String(d._id) : String(d));
+                            return dId === String(existingId);
+                        });
+                        if (idx !== -1) {
+                            propertyDoc.documents[idx] = newDoc._id;
+                        } else {
+                            propertyDoc.documents.push(newDoc._id);
+                        }
+                    } else {
+                        propertyDoc.documents = [newDoc._id];
+                    }
 
-                    // await propertyDoc.save();
-                    // console.log("Replaced existing document with new one:", newDoc);
+                    logger.info('Replaced existing document with new one', {
+                        propertyId,
+                        documentType: doc.documentType,
+                        newDocumentId: newDoc._id,
+                        replacedDocumentId: existingId
+                    });
                 } else {
                     console.log("No existing document found, adding new document:", doc);
-                    propertyDoc.documents = data;
                     const newDocuments = new PropertyDocsModel(doc);
-
                     await newDocuments.save();
 
                     propertyDoc.documents.push(newDocuments._id);
 
-                    await propertyDoc.save();
+                    logger.info('Added new document', {
+                        propertyId,
+                        documentType: doc.documentType,
+                        newDocumentId: newDocuments._id
+                    });
                 }
-            });
+            }
+
+            await propertyDoc.save();
+            logger.info("Property documents array updated successfully", { propertyId });
+
         }, 'save');
     }
 

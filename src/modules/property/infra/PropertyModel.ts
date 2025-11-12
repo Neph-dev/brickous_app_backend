@@ -44,6 +44,24 @@ const PropertySchema = new Schema<PropertySchemaType>({
             message: (props) => `${props.value} is not a valid contract address!`
         }
     },
+    deployment: {
+        deploymentDate: {
+            type: Date,
+            required: false
+        },
+        deployedAt: {
+            type: Date,
+            required: false
+        },
+        deployedBy: {
+            type: Schema.Types.Mixed,
+            required: false
+        },
+        transactionHash: {
+            type: String,
+            required: false
+        }
+    },
     status: {
         type: String,
         required: true,

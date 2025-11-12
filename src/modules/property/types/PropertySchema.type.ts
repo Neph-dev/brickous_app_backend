@@ -12,4 +12,10 @@ export interface PropertySchemaType {
     status: PropertyStatus;
     createdAt?: Date;
     updatedAt?: Date;
+    deployment?: {
+        deploymentDate?: Date;
+        deployedAt?: Date;
+        deployedBy?: mongoose.Types.ObjectId | String;
+        transactionHash?: String;
+    };
 }

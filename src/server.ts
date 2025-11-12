@@ -14,6 +14,8 @@ import apiRouter from './routes';
 import propertyRouter from './modules/property/routes/propertyRoutes';
 import developerRouter from './modules/developer/routes/developerRoutes';
 import authRouter from './modules/auth/routes/authRoutes';
+import { deploymentRoutes } from './modules/deployment/routes';
+import { DeploymentScheduler } from './scheduler';
 import { validateEnv } from './shared/utils/validations';
 
 
@@ -133,6 +135,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use('/api/v1', authRouter);
 app.use('/api/v1', propertyRouter);
 app.use('/api/v1', developerRouter);
+app.use('/api/v1/deployment', deploymentRoutes);
 
 app.use((req: Request, res: Response) => {
     res.status(NOT_FOUND.statusCode).json({ NOT_FOUND });
@@ -168,6 +171,10 @@ const connectDB = async () => {
             // tlsAllowInvalidCertificates: false
         });
         console.log('✅ Connected to MongoDB with Mongoose');
+
+        const deploymentScheduler = new DeploymentScheduler();
+        deploymentScheduler.start();
+
         app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
     } catch (err) {
         // console current IP address
